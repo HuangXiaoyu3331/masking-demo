@@ -1,0 +1,27 @@
+dataSources:
+  master:
+    dataSourceClassName: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://127.0.0.1:3306/testdb?characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true
+    username: hxy
+    password: hxy
+
+mode:
+  type: Standalone
+  repository:
+    type: JDBC
+
+rules:
+  - !MASK
+    tables:
+      t_user:
+        columns:
+          mobile:
+            maskAlgorithm: keep_from_x_to_y
+
+    maskAlgorithms:
+      keep_from_x_to_y:
+        type: MASK_FROM_X_TO_Y
+        props:
+          from-x: 3
+          to-y: 6
+          replace-char: '*'

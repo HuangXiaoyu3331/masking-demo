@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!--配置日志文件存放目录-->
+    <springProperty scope="context" name="server.name" source="spring.application.name"/>
+    <springProperty scope="context" name="log.dir" source="logback.dir"/>
+    <springProperty scope="context" name="log.level" source="logback.level"/>
+
+    <contextName>${server.name}</contextName>
+    <!-- 彩色日志 -->
+    <!-- 彩色日志依赖的渲染类 （INFO：绿色  WARN：黄色  ERROR：红色）-->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <!-- 彩色日志格式 -->
+    <!--
+        %d{yyyy-MM-dd HH:mm:ss.SSS}:日志输出时间(精确到毫秒)
+        %5p:日志级别
+        %contextName:应用名称
+        ${PID:- }:进程id
+        %15.15thread:线程名
+        %-40.40logger{39}:Logger名，通常使用源代码的类名
+        %m:日志内容
+        %n:换行
+    -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%5p) %magenta(${PID:- }) --- [%15.15thread] %cyan(%-40.40logger{39}) : %m%n"/>
+
+    <!-- Console 输出设置 -->
+    <appender name="STD-OUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+        <!--日志输出级别-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+    </appender>
+
+    <!-- 文件保存日志的相关配置 INFO，按时间跟大小进行分割 -->
+    <appender name="FILE-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 保存日志文件的路径 -->
+        <file>${log.dir}/${server.name}.log</file>
+        <!-- 日志格式 -->
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+        <!-- 日志级别过滤器 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 过滤的级别 -->
+            <level>INFO</level>
+            <!-- 匹配时的操作：接收（记录） -->
+            <!--<onMatch>ACCEPT</onMatch>-->
+            <!-- 不匹配时的操作：拒绝（不记录） -->
+            <!--<onMismatch>DENY</onMismatch>-->
+        </filter>
+        <!-- 循环政策：基于时间创建日志文件 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件名格式 -->
+            <fileNamePattern>${log.dir}/${server.name}.log.%d{yyyy-MM-dd}</fileNamePattern>
+            <!-- 最大保存时间：30天-->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <root level="${log.level}">
+        <appender-ref ref="FILE-OUT"/>
+        <appender-ref ref="STD-OUT"/>
+    </root>
+
+</configuration>
